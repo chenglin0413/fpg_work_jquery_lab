@@ -112,8 +112,16 @@
 </span>
 </body>
 <script>
-    // var loc_property = "";
+    
+    
     var map_multi_data=new Map();
+    $( document).ready(function(){
+    	var loc_storage = localStorage.getItem("addressbook-data");//讀取 localStorage 內物件
+    	console.log("loc_storage : "+loc_storage);
+    });
+    function get_outer_html(obj){
+    	return obj.prop("outerHTML");
+    }
     function save_process(obj){
         var map_sing_data = new Map();
         var name_obj = obj.find("#name");
@@ -197,10 +205,10 @@
     */
     $("#add-btn").click(function () {
         var obj_div_tr_temp =  $("#temp > #div-tr-temp");//取得dom 物件
-        var str_div_temp = obj_div_tr_temp.prop("outerHTML");//取得HTML
+        var html_div_temp = get_outer_html(obj_div_tr_temp);//取得HTML
         var id_div_tr_temp = getID(obj_div_tr_temp);//取得tr_id 值
 
-        $(".tbody ").append(str_div_temp);//將樣板塞入
+        $(".tbody ").append(html_div_temp);//將樣板塞入
         var new_obj_div_tr_temp =$(".tbody").find($("#div-tr-temp"));//取得新樣板
         var new_obj_div_tr_temp_save_btn =$(".tbody").find($("#save-btn"));//取得新樣板之save-btn
         var new_obj_div_tr_temp_cancel_btn =$(".tbody").find($("#cancel-btn"));//取得新樣板之cancel-btn
@@ -228,20 +236,7 @@
         // var map_sing_data=new Map();
     	var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var map_sing_data = save_process(obj_div_tr);
-        var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值
-        // var name = obj_div_tr.find($("#name > input")).val();//取得name 內的值
-        // var tel = obj_div_tr.find($("#tel > input")).val();//取得tel 內的值
-        // // var typeIndex = obj_div_tr.find($("#type >  select > option:selected")).index();//取得type  option 的索引
-        // var name_obj = obj_div_tr.find("#name");
-        // var tel_obj = obj_div_tr.find("#tel");
-        // var type_obj = obj_div_tr.find("#type");//取得type obj
-        // var notes_obj = obj_div_tr.find("#notes");
-        // var typeIndex = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
-        // var type =type_obj.find($("select > option:selected")).val();
-        // var notes = obj_div_tr.find($("#notes > textarea")).val();//取得notes textarea的值
-        
-    	// console.log(no+name+tel+typeIndex+notes+type);
-    	
+        var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
         map_multi_data.set(no,map_sing_data);        
 
         // 將編輯格式隱藏
@@ -265,18 +260,26 @@
     2.將.text 資料塞回 input,textarea,select
     */
     $(".tbody").on("click",".cancel-btn",function () {
+
+
         var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var name = obj_div_tr.find($("#name > .text")).text();//取得name 內的值
         var tel = obj_div_tr.find($("#tel > .text")).text();//取得tel 內的值
         var notes = obj_div_tr.find($("#notes > .text")).text();//取得notes textarea的值
-        //取消後將資料復原
-        obj_div_tr.find("#name > input").val(name);
-        obj_div_tr.find("#tel > input").val(tel);
-        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
-        obj_div_tr.find("#notes > textarea").val(notes);
-        console.log(no+name+tel+notes);
-        //將閱讀格式隱藏，將原text欄位隱藏
-        readModeBtn(obj_div_tr);      
+        if((name!=null&& name!="")||(tel!=null&& tel!="")||(notes!=null&& notes!="")){//判斷已經儲存過
+        	//取消後將資料復原
+	        obj_div_tr.find("#name > input").val(name);
+	        obj_div_tr.find("#tel > input").val(tel);
+	        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
+	        obj_div_tr.find("#notes > textarea").val(notes);
+	        // console.log(no+name+tel+notes);
+	        //將閱讀格式隱藏，將原text欄位隱藏
+	        readModeBtn(obj_div_tr);    
+        }else{//第一次產生的DOM 
+        	console.log("第一次產生被取消");
+        	obj_div_tr.remove();//將tr元素移除、清空
+        }
+          
     });
     /*
     0.點選garbage-btn 將編輯模式取消，回到顯示模式
