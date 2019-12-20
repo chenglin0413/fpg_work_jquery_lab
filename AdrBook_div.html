@@ -125,13 +125,22 @@
     function get_outer_html(obj){
     	return obj.prop("outerHTML");
     }
+    function edit_process(obj){
+        var no = obj.find($("#no > .text")).text();//取得no 內的值
+        var name = obj.find($("#name > .text")).text();//取得name 內的值
+        var tel = obj.find($("#tel > .text")).text();//取得tel 內的值
+        var notes = obj.find($("#notes > .text")).text();//取得notes textarea的值
+        obj.find("#no > input").val(no);
+	    obj.find("#name > input").val(name);
+	    obj.find("#tel > input").val(tel);
+	    obj.find("select")[0].selectedIndex=obj.find(".selectIndex").text();
+	    obj.find("#notes > textarea").val(notes);
+    }
     function save_process(obj){
         var map_sing_data = {};
         var name_obj = obj.find("#name");
         var tel_obj = obj.find("#tel");
         var type_obj = obj.find("#type");//取得type obj
-        // var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
-        // var type =type_obj.find($("select > option:selected")).val();
         var notes_obj = obj.find("#notes");
         var arr = get_tr_property(obj);      
         // 將資料存入並轉成顯示模式
@@ -157,11 +166,6 @@
         var type =type_obj.find($("select > option:selected")).val();
         var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
         arr_val=[name,tel,notes,type,type_index.toString()];
-        // arr_val.push(name);
-        // arr_val.push(tel);
-        // arr_val.push(notes);
-        // arr_val.push(type);
-        // arr_val.push(type_index);
         return arr_val;
     }
     function getID(str){
@@ -255,6 +259,8 @@
     */
     $(".tbody").on("click",".edit-btn",function () {
         var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
+        //將.text 資料塞入 input
+        edit_process(obj_div_tr);
         //將閱讀格式隱藏，將原text欄位隱藏
         editModeBtn(obj_div_tr);       
     });
@@ -303,9 +309,6 @@
                 var map_sing_data = {};  
 				// console.log('del :'+num);
                 var obj_div_tr = $(this);
-                // var type_obj = obj_div_tr.find("#type");//取得type obj
-                // var type =type_obj.find($("select > option:selected")).val();
-                // var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
                 var arr = get_tr_property(obj_div_tr);
                 // 將資料以k,v 格式存入arr{map}中
                 map_sing_data["name"]=arr[0];
