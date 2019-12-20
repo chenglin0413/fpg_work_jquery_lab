@@ -306,7 +306,6 @@
         if(check){
             map_multi_data = {};//將資料刷新重新存     
             obj_div_tr.remove();//將tr元素移除、清空
-            var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
             var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
             obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
                 var num = parseInt(index)+1;
@@ -320,14 +319,13 @@
                 map_sing_data["notes"]=arr[2];
                 map_sing_data["type"]=arr[3];
                 map_sing_data["type_index"]=arr[4];
-                map_multi_data[num.toString()]=map_sing_data; 
-                
-                set_loc_store(map_multi_data,inner_html);
+                map_multi_data[num.toString()]=map_sing_data;
 				$(this).find("#no > .text").text(num);
 				$(this).find("#no > input").val(num);
             });
-            console.log(inner_html);  
-            
+            var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
+            set_loc_store(map_multi_data,inner_html);
+            console.log(inner_html);              
         }
     });
 
