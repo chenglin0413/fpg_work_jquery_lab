@@ -116,10 +116,11 @@
     
     var map_multi_data={};
     $( document).ready(function(){
-    	var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
-    	var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom
-    	console.log("loc_storage_data : "+loc_storage_data_json);
-    	console.log("loc_storage_dom : "+loc_storage_dom);
+        var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
+        var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom
+        var class_tbody = $(".tbody");
+        class_tbody.append(loc_storage_dom);//retrive the dom elemetn from localstorage ,append  on tbody
+        readModeBtn(class_tbody);
     });
     function get_outer_html(obj){
     	return obj.prop("outerHTML");
@@ -214,10 +215,7 @@
         var new_obj_div_tr_temp =$(".tbody").find($("#div-tr-temp"));//取得新樣板
         var new_obj_div_tr_temp_save_btn =$(".tbody").find($("#save-btn"));//取得新樣板之save-btn
         var new_obj_div_tr_temp_cancel_btn =$(".tbody").find($("#cancel-btn"));//取得新樣板之cancel-btn
-        var id_save_btn = getID(new_obj_div_tr_temp_save_btn);
-        var id_cancel_btn = getID(new_obj_div_tr_temp_cancel_btn);
         // $(".tbody .tr #no input").last().attr("disabled",true).val(no_index);//將第一個屬性設為disabled 並加index新增
-        
         var tr_size = $(".tbody > .tr").length;//取得 tbody > .tr element 的數量
         $(".tbody .tr #no input").last().attr("disabled",true).val(tr_size);//
         $(".tbody .tr #no .text").last().text(tr_size);
@@ -240,14 +238,14 @@
         var map_sing_data = save_process(obj_div_tr);
         var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
         map_multi_data[no.toString()] = map_sing_data;//儲存資料 
-        var outer_html =get_outer_html(obj_div_tr.parent());// 儲存DOM格式
+        var inner_html =obj_div_tr.parent().prop("innerHTML");// 儲存DOM格式
+        localStorage.clear();
         localStorage.setItem("addressbook-data",JSON.stringify(map_multi_data));
-        // localStorage.setItem("addressbook-data","12345678");
-        localStorage.setItem("addressbook-dom",outer_html);
+        localStorage.setItem("addressbook-dom",inner_html);
         // 將編輯格式隱藏
         readModeBtn(obj_div_tr);
-        console.log(map_multi_data);
-        // console.log(JSON.stringify(map_multi_data));
+        console.log(inner_html);
+        console.log(JSON.stringify(map_multi_data));
         // console.log(JSON.parse(JSON.stringify(map_multi_data)));
     });
 
