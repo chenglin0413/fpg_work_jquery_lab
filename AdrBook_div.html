@@ -112,10 +112,20 @@
 </span>
 </body>
 <script>
-    // var loc_property = "";
-    var map_multi_data=new Map();
+    
+    
+    var map_multi_data={};
+    $( document).ready(function(){
+    	var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
+    	var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom
+    	console.log("loc_storage_data : "+loc_storage_data_json);
+    	console.log("loc_storage_dom : "+loc_storage_dom);
+    });
+    function get_outer_html(obj){
+    	return obj.prop("outerHTML");
+    }
     function save_process(obj){
-        var map_sing_data = new Map();
+        var map_sing_data = {};
         var name_obj = obj.find("#name");
         var tel_obj = obj.find("#tel");
         var type_obj = obj.find("#type");//取得type obj
@@ -130,11 +140,11 @@
         setText(type_obj.find(".text"),arr[3]);
         setText(type_obj.find(".selectIndex"),arr[4]);
         // 將資料以k,v 格式存入arr{map}中
-        map_sing_data.set("name",arr[0]);
-        map_sing_data.set("tel",arr[1]);        
-        map_sing_data.set("notes",arr[2]);
-        map_sing_data.set("type",arr[3]);
-        map_sing_data.set("type_index",arr[4]);
+        map_sing_data["name"] = arr[0];
+        map_sing_data["tel"] = arr[1];        
+        map_sing_data["notes"] = arr[2];
+        map_sing_data["type"] = arr[3];
+        map_sing_data["type_index"] = arr[4];
     	return map_sing_data;
     }
     function get_tr_property(obj){
@@ -145,7 +155,7 @@
         var type_obj = obj.find("#type");//取得type obj
         var type =type_obj.find($("select > option:selected")).val();
         var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
-        arr_val=[name,tel,notes,type,type_index];
+        arr_val=[name,tel,notes,type,type_index.toString()];
         // arr_val.push(name);
         // arr_val.push(tel);
         // arr_val.push(notes);
@@ -197,10 +207,10 @@
     */
     $("#add-btn").click(function () {
         var obj_div_tr_temp =  $("#temp > #div-tr-temp");//取得dom 物件
-        var str_div_temp = obj_div_tr_temp.prop("outerHTML");//取得HTML
+        var html_div_temp = get_outer_html(obj_div_tr_temp);//取得HTML
         var id_div_tr_temp = getID(obj_div_tr_temp);//取得tr_id 值
 
-        $(".tbody ").append(str_div_temp);//將樣板塞入
+        $(".tbody ").append(html_div_temp);//將樣板塞入
         var new_obj_div_tr_temp =$(".tbody").find($("#div-tr-temp"));//取得新樣板
         var new_obj_div_tr_temp_save_btn =$(".tbody").find($("#save-btn"));//取得新樣板之save-btn
         var new_obj_div_tr_temp_cancel_btn =$(".tbody").find($("#cancel-btn"));//取得新樣板之cancel-btn
@@ -228,26 +238,17 @@
         // var map_sing_data=new Map();
     	var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var map_sing_data = save_process(obj_div_tr);
-        var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值
-        // var name = obj_div_tr.find($("#name > input")).val();//取得name 內的值
-        // var tel = obj_div_tr.find($("#tel > input")).val();//取得tel 內的值
-        // // var typeIndex = obj_div_tr.find($("#type >  select > option:selected")).index();//取得type  option 的索引
-        // var name_obj = obj_div_tr.find("#name");
-        // var tel_obj = obj_div_tr.find("#tel");
-        // var type_obj = obj_div_tr.find("#type");//取得type obj
-        // var notes_obj = obj_div_tr.find("#notes");
-        // var typeIndex = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
-        // var type =type_obj.find($("select > option:selected")).val();
-        // var notes = obj_div_tr.find($("#notes > textarea")).val();//取得notes textarea的值
-        
-    	// console.log(no+name+tel+typeIndex+notes+type);
-    	
-        map_multi_data.set(no,map_sing_data);        
-
+        var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
+        map_multi_data[no.toString()] = map_sing_data;//儲存資料 
+        var outer_html =get_outer_html(obj_div_tr.parent());// 儲存DOM格式
+        localStorage.setItem("addressbook-data",JSON.stringify(map_multi_data));
+        // localStorage.setItem("addressbook-data","12345678");
+        localStorage.setItem("addressbook-dom",outer_html);
         // 將編輯格式隱藏
         readModeBtn(obj_div_tr);
         console.log(map_multi_data);
-
+        // console.log(JSON.stringify(map_multi_data));
+        // console.log(JSON.parse(JSON.stringify(map_multi_data)));
     });
 
     /*
@@ -265,18 +266,26 @@
     2.將.text 資料塞回 input,textarea,select
     */
     $(".tbody").on("click",".cancel-btn",function () {
+
+
         var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var name = obj_div_tr.find($("#name > .text")).text();//取得name 內的值
         var tel = obj_div_tr.find($("#tel > .text")).text();//取得tel 內的值
         var notes = obj_div_tr.find($("#notes > .text")).text();//取得notes textarea的值
-        //取消後將資料復原
-        obj_div_tr.find("#name > input").val(name);
-        obj_div_tr.find("#tel > input").val(tel);
-        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
-        obj_div_tr.find("#notes > textarea").val(notes);
-        console.log(no+name+tel+notes);
-        //將閱讀格式隱藏，將原text欄位隱藏
-        readModeBtn(obj_div_tr);      
+        if((name!=null&& name!="")||(tel!=null&& tel!="")||(notes!=null&& notes!="")){//判斷已經儲存過
+        	//取消後將資料復原
+	        obj_div_tr.find("#name > input").val(name);
+	        obj_div_tr.find("#tel > input").val(tel);
+	        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
+	        obj_div_tr.find("#notes > textarea").val(notes);
+	        // console.log(no+name+tel+notes);
+	        //將閱讀格式隱藏，將原text欄位隱藏
+	        readModeBtn(obj_div_tr);    
+        }else{//第一次產生的DOM 
+        	console.log("第一次產生被取消");
+        	obj_div_tr.remove();//將tr元素移除、清空
+        }
+          
     });
     /*
     0.點選garbage-btn 將編輯模式取消，回到顯示模式
@@ -288,12 +297,12 @@
         var check = confirm("Are you sure you want to delete "+name+"from AddressBook?");
         
         if(check){
-            map_multi_data=new Map();//將資料刷新重新存           
+            map_multi_data = {};//將資料刷新重新存           
             obj_div_tr.remove();//將tr元素移除、清空
             var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
             obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
                 var num = parseInt(index)+1;
-                var map_sing_data=new Map();  
+                var map_sing_data = {};  
 				// console.log('del :'+num);
                 var obj_div_tr = $(this);
                 // var type_obj = obj_div_tr.find("#type");//取得type obj
@@ -301,12 +310,12 @@
                 // var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
                 var arr = get_tr_property(obj_div_tr);
                 // 將資料以k,v 格式存入arr{map}中
-                map_sing_data.set("name",arr[0]);
-                map_sing_data.set("tel",arr[1]);        
-                map_sing_data.set("notes",arr[2]);
-                map_sing_data.set("type",arr[3]);
-                map_sing_data.set("type_index",arr[4]);
-                map_multi_data.set(num,map_sing_data); 
+                map_sing_data["name"]=arr[0];
+                map_sing_data["tel"]=arr[1];        
+                map_sing_data["notes"]=arr[2];
+                map_sing_data["type"]=arr[3];
+                map_sing_data["type_index"]=arr[4];
+                map_multi_data[num.toString()]=map_sing_data; 
                          	
 				$(this).find("#no > .text").text(num);
 				$(this).find("#no > input").val(num);
