@@ -115,15 +115,21 @@
     
     
     var map_multi_data={};
+    var loc_store_flag=false;
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
-        var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom
+        var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
         var class_tbody = $(".tbody");
         class_tbody.append(loc_storage_dom);//retrive the dom elemetn from localstorage ,append  on tbody
         readModeBtn(class_tbody);
     });
     function get_outer_html(obj){
     	return obj.prop("outerHTML");
+    }
+    function set_loc_store(obj,dom){
+        localStorage.clear();
+        localStorage.setItem("addressbook-data",JSON.stringify(obj));
+        localStorage.setItem("addressbook-dom",dom);
     }
     function edit_process(obj){
         var no = obj.find($("#no > .text")).text();//取得no 內的值
@@ -243,13 +249,14 @@
         var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
         map_multi_data[no.toString()] = map_sing_data;//儲存資料 
         var inner_html =obj_div_tr.parent().prop("innerHTML");// 儲存DOM格式
-        localStorage.clear();
-        localStorage.setItem("addressbook-data",JSON.stringify(map_multi_data));
-        localStorage.setItem("addressbook-dom",inner_html);
+        set_loc_store(map_multi_data,inner_html);
+        // localStorage.clear();
+        // localStorage.setItem("addressbook-data",JSON.stringify(map_multi_data));
+        // localStorage.setItem("addressbook-dom",inner_html);
         // 將編輯格式隱藏
         readModeBtn(obj_div_tr);
-        console.log(inner_html);
-        console.log(JSON.stringify(map_multi_data));
+        // console.log(inner_html);
+        // console.log(JSON.stringify(map_multi_data));
         // console.log(JSON.parse(JSON.stringify(map_multi_data)));
     });
 
@@ -270,8 +277,6 @@
     2.將.text 資料塞回 input,textarea,select
     */
     $(".tbody").on("click",".cancel-btn",function () {
-
-
         var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var name = obj_div_tr.find($("#name > .text")).text();//取得name 內的值
         var tel = obj_div_tr.find($("#tel > .text")).text();//取得tel 內的值
@@ -288,8 +293,7 @@
         }else{//第一次產生的DOM 
         	console.log("第一次產生被取消");
         	obj_div_tr.remove();//將tr元素移除、清空
-        }
-          
+        }    
     });
     /*
     0.點選garbage-btn 將編輯模式取消，回到顯示模式
@@ -299,10 +303,10 @@
         var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var name = obj_div_tr.find("#name .text").text();
         var check = confirm("Are you sure you want to delete "+name+"from AddressBook?");
-        
         if(check){
-            map_multi_data = {};//將資料刷新重新存           
+            map_multi_data = {};//將資料刷新重新存     
             obj_div_tr.remove();//將tr元素移除、清空
+            var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
             var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
             obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
                 var num = parseInt(index)+1;
@@ -317,11 +321,12 @@
                 map_sing_data["type"]=arr[3];
                 map_sing_data["type_index"]=arr[4];
                 map_multi_data[num.toString()]=map_sing_data; 
-                         	
+                
+                set_loc_store(map_multi_data,inner_html);
 				$(this).find("#no > .text").text(num);
 				$(this).find("#no > input").val(num);
             });
-            console.log(map_multi_data);  
+            console.log(inner_html);  
             
         }
     });
