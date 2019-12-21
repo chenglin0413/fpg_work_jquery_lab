@@ -121,6 +121,14 @@
     
     var map_multi_data={};
     var loc_ser_number = 0;
+    var d = new Date();// 取得現在時間
+    var date_str = d.getFullYear() + "-" +  ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+    ("0" + d.getDate()).slice(-2) +  " " 
+    + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)+ ":" +("0" + d.getSeconds()).slice(-2)
+        + " "+ d.getMilliseconds();
+
+
+    console.log("time: "+ date_str);
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
         var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
@@ -240,8 +248,6 @@
         loc_ser_number++;
         var obj_div_tr_temp =  $("#temp > #div-tr-temp");//取得dom 物件
         var html_div_temp = get_outer_html(obj_div_tr_temp);//取得HTML
-        var id_div_tr_temp = getID(obj_div_tr_temp);//取得tr_id 值
-
         $(".tbody ").append(html_div_temp);//將樣板塞入
         // var new_obj_div_tr_temp =$(".tbody").find($("#div-tr-temp"));//取得新樣板
         // var new_obj_div_tr_temp_cancel_btn =$(".tbody").find($("#cancel-btn"));//取得新樣板之cancel-btn
@@ -305,6 +311,10 @@
 	        obj_div_tr.find("#tel > input").val(tel);
 	        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
 	        obj_div_tr.find("#notes > textarea").val(notes);
+            // var result = "";
+            // obj_div_tr.find("input[type=radio]:checked").each(function () {
+            //     result = $(this).index();
+            // });
 	        // console.log(no+name+tel+notes);
 	        //將閱讀格式隱藏，將原text欄位隱藏
 	        readModeBtn(obj_div_tr);    
