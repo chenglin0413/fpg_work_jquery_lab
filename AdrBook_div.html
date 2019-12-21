@@ -48,9 +48,7 @@
             width: 30px;
             height: 30px;
             border-radius:20%;
-            margin-bottom: 4px;
-           
-
+            margin-bottom: 4px;     
         }
     </style>
     
@@ -63,13 +61,10 @@
 </head>
 
 <body>
-    
     <div>
-        <h2 style="text-align:center"> AddressBook_lab</h2>
-        
+        <h2 style="text-align:center"> AddressBook_lab</h2>   
     </div>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"></script>
-
         <button id="add-btn" class="addressbook-table-add"><i class="fas fa-plus-square"></i></button>
         <BR>
         <div class="addressbook-table">
@@ -86,8 +81,7 @@
             </div>
             <div class="tbody">
             </div>
-        </div>
-    
+        </div>  
 <!--樣板-->
 <span id="temp" style="display: none">
 <div id="div-tr-temp" class="tr"  >
@@ -116,19 +110,15 @@
 </div>
 </span>
 </body>
-<script>
-    
-    
+<script>  
     var map_multi_data={};
-    var loc_ser_number = 0;
+    var arr_keys = ["name","tel","notes","type","type_index","gender"];
+    var loc_ser_number = 0;// store gender 's radio name serial_number
     var d = new Date();// 取得現在時間
     var date_str = d.getFullYear() + "-" +  ("0"+(d.getMonth()+1)).slice(-2) + "-" +
     ("0" + d.getDate()).slice(-2) +  " " 
     + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)+ ":" +("0" + d.getSeconds()).slice(-2)
         + " "+ d.getMilliseconds();
-
-
-    console.log("time: "+ date_str);
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
         var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
@@ -137,7 +127,6 @@
         map_multi_data = JSON.parse(loc_storage_data_json);
         loc_ser_number = localStorage.getItem("loc_ser_number");
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
-        // if(loc_ser_number==null)loc_ser_number= 0;// if loc_map is null , then give a  new {}
         console.log("init:"+loc_ser_number);
         readModeBtn(class_tbody);
     });
@@ -154,11 +143,20 @@
         var name = obj.find($("#name > .text")).text();//取得name 內的值
         var tel = obj.find($("#tel > .text")).text();//取得tel 內的值
         var notes = obj.find($("#notes > .text")).text();//取得notes textarea的值
+        var gender = obj.find("#gender > .text").text();
         obj.find("#no > input").val(no);
 	    obj.find("#name > input").val(name);
 	    obj.find("#tel > input").val(tel);
 	    obj.find("select")[0].selectedIndex=obj.find(".selectIndex").text();
 	    obj.find("#notes > textarea").val(notes);
+        obj.find("input[type=radio][value="+gender+"]").prop("checked",true);
+    }
+    function set_sing_data_to_map_from_arr(arr,map){
+        for(var k=0;k<arr_keys.length;k++){
+            var key = arr_keys[k];
+            map[key]=arr[k];
+        }
+        return map;
     }
     function save_process(obj){
         var map_sing_data = {};
@@ -176,13 +174,7 @@
         setText(type_obj.find(".selectIndex"),arr[4]);
         setText(gender_obj.find(".text"),arr[5]);
         // 將資料以k,v 格式存入arr{map}中
-        map_sing_data["name"] = arr[0];
-        map_sing_data["tel"] = arr[1];        
-        map_sing_data["notes"] = arr[2];
-        map_sing_data["type"] = arr[3];
-        map_sing_data["type_index"] = arr[4];
-        map_sing_data["gender"] = arr[5];
-    	return map_sing_data;
+    	return set_sing_data_to_map_from_arr(arr,map_sing_data);
     }
     function get_tr_property(obj){
         var arr_val = new Array();
@@ -224,21 +216,20 @@
         obj.find("#gender > .text").show();
     }
     function editModeBtn(obj){
-        obj.find($("input")).show();
+        obj.find("input").show();
         obj.find(".inner_text").show();
-        obj.find($("select")).show();
-        obj.find($("textarea")).show();
-        obj.find($(".save-btn")).show();
-        obj.find($(".cancel-btn")).show();
-        obj.find($(".edit-btn")).hide();
-        obj.find($(".del-btn")).hide();
+        obj.find("select").show();
+        obj.find("textarea").show();
+        obj.find(".save-btn").show();
+        obj.find(".cancel-btn").show();
+        obj.find(".edit-btn").hide();
+        obj.find(".del-btn").hide();
         obj.find("#no >.text").hide();
         obj.find("#name > .text").hide();
         obj.find("#tel > .text").hide();
         obj.find("#gender > .text").hide();
         obj.find("#type > .text").hide();
         obj.find("#notes > .text").hide();
-
     }
     /*新增動作
     1.新增一個樣板
@@ -275,12 +266,9 @@
         map_multi_data[no.toString()] = map_sing_data;//儲存資料 
         var inner_html =obj_div_tr.parent().prop("innerHTML");// 儲存DOM格式
         set_loc_store(map_multi_data,inner_html);
-
         // 將編輯格式隱藏
         readModeBtn(obj_div_tr);
         console.log(map_multi_data);
-        var index = obj_div_tr.find("#gender > input").prop("name");
-        console.log("savebtn :"+index);
         // console.log(JSON.parse(JSON.stringify(map_multi_data)));
     });
 
@@ -340,13 +328,7 @@
                 var obj_div_tr = $(this);// obj_tbody_tr each item
                 var arr = get_tr_property(obj_div_tr);
                 // 將資料以k,v 格式存入arr{map}中
-                map_sing_data["name"]=arr[0];
-                map_sing_data["tel"]=arr[1];        
-                map_sing_data["notes"]=arr[2];
-                map_sing_data["type"]=arr[3];
-                map_sing_data["type_index"]=arr[4];
-                map_sing_data["gender"] = arr[5];
-                map_multi_data[num.toString()]=map_sing_data;
+                map_multi_data[num.toString()]=set_sing_data_to_map_from_arr(arr,map_sing_data);
 				$(this).find("#no > .text").text(num);
 				$(this).find("#no > input").val(num);
             });
@@ -355,9 +337,6 @@
             console.log(map_multi_data);              
         }
     });
-
-
-
 </script>
 
 </html>
