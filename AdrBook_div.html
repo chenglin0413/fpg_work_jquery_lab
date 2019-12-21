@@ -307,14 +307,12 @@
         var notes = obj_div_tr.find($("#notes > .text")).text();//取得notes textarea的值
         if((name!=null&& name!="")||(tel!=null&& tel!="")||(notes!=null&& notes!="")){//判斷已經儲存過
         	//取消後將資料復原
+            var gender = obj_div_tr.find("#gender > .text").text();
 	        obj_div_tr.find("#name > input").val(name);
 	        obj_div_tr.find("#tel > input").val(tel);
 	        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
-	        obj_div_tr.find("#notes > textarea").val(notes);
-            // var result = "";
-            // obj_div_tr.find("input[type=radio]:checked").each(function () {
-            //     result = $(this).index();
-            // });
+	        obj_div_tr.find("#notes > textarea").val(notes); 
+            obj_div_tr.find("input[type=radio][value="+gender+"]").prop("checked",true);
 	        // console.log(no+name+tel+notes);
 	        //將閱讀格式隱藏，將原text欄位隱藏
 	        readModeBtn(obj_div_tr);    
@@ -339,7 +337,7 @@
                 var num = parseInt(index)+1;
                 var map_sing_data = {};  
 				// console.log('del :'+num);
-                var obj_div_tr = $(this);
+                var obj_div_tr = $(this);// obj_tbody_tr each item
                 var arr = get_tr_property(obj_div_tr);
                 // 將資料以k,v 格式存入arr{map}中
                 map_sing_data["name"]=arr[0];
@@ -347,13 +345,14 @@
                 map_sing_data["notes"]=arr[2];
                 map_sing_data["type"]=arr[3];
                 map_sing_data["type_index"]=arr[4];
+                map_sing_data["gender"] = arr[5];
                 map_multi_data[num.toString()]=map_sing_data;
 				$(this).find("#no > .text").text(num);
 				$(this).find("#no > input").val(num);
             });
             var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
             set_loc_store(map_multi_data,inner_html);
-            console.log(inner_html);              
+            console.log(map_multi_data);              
         }
     });
 
