@@ -127,9 +127,9 @@
         var class_tbody = $(".tbody");
         class_tbody.append(loc_storage_dom);//retrive the dom elemetn from localstorage ,append  on tbody
         map_multi_data = JSON.parse(loc_storage_data_json);
-        loc_ser_number = JSON.parse(localStorage.getItem("loc_ser_number"));
+        loc_ser_number = localStorage.getItem("loc_ser_number");
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
-        if(loc_ser_number==null)loc_ser_number= 0;// if loc_map is null , then give a  new {}
+        // if(loc_ser_number==null)loc_ser_number= 0;// if loc_map is null , then give a  new {}
         console.log("init:"+loc_ser_number);
         readModeBtn(class_tbody);
     });
@@ -273,7 +273,8 @@
         // 將編輯格式隱藏
         readModeBtn(obj_div_tr);
         console.log(map_multi_data);
-        // console.log(JSON.stringify(map_multi_data));
+        var index = obj_div_tr.find("#gender > input").prop("name");
+        console.log("savebtn :"+index);
         // console.log(JSON.parse(JSON.stringify(map_multi_data)));
     });
 
