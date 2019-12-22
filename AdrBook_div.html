@@ -116,11 +116,7 @@
     var map_multi_data={};
     var arr_keys = ["name","tel","notes","type","type_index","gender","timestamp"];
     var loc_ser_number = 0;// store gender 's radio name serial_number
-    var d = new Date();// 取得現在時間
-    var date_str = d.getFullYear() + "-" +  ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-    ("0" + d.getDate()).slice(-2) +  " " 
-    + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)+ ":" +("0" + d.getSeconds()).slice(-2)
-        + " "+ d.getMilliseconds();
+    
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
         var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
@@ -132,6 +128,14 @@
         console.log("init:"+loc_ser_number);
         readModeBtn(class_tbody);
     });
+    function get_date_str(){
+        var d = new Date();// 取得現在時間
+        var date_str = d.getFullYear() + "-" +  ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+        ("0" + d.getDate()).slice(-2) +  " " 
+        + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)+ ":" +
+        ("0" + d.getSeconds()).slice(-2) + " "+ d.getMilliseconds();
+        return date_str;
+    }
     function get_outer_html(obj){
     	return obj.prop("outerHTML");
     }
@@ -189,7 +193,7 @@
         var type =type_obj.find($("select > option:selected")).val();
         var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
         var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
-        var timestamp = date_str;
+        var timestamp = get_date_str();
         arr_val=[name,tel,notes,type,type_index.toString(),gender,timestamp];
         return arr_val;
     }
