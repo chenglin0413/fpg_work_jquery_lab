@@ -77,6 +77,7 @@
                     <div  class="th">type(類型)</div>
                     <div  class="th">notes(備註)</div>
                     <div  class="th">function(功能)</div>
+                    <div  class="th">Update Date(更新時間)</div>
                 </div>
             </div>
             <div class="tbody">
@@ -107,12 +108,13 @@
             <button id="edit-btn" class="edit-btn" style="display: none;"><i class="fas fa-pen-square"></i></button>
             <button id="del-btn" class="del-btn" style="display: none;"><i class="far fa-trash-alt"></i></button>
         </div>
+        <div id="timestamp" class="td"><div class="text" style="display: none;"></div></div>
 </div>
 </span>
 </body>
 <script>  
     var map_multi_data={};
-    var arr_keys = ["name","tel","notes","type","type_index","gender"];
+    var arr_keys = ["name","tel","notes","type","type_index","gender","timestamp"];
     var loc_ser_number = 0;// store gender 's radio name serial_number
     var d = new Date();// 取得現在時間
     var date_str = d.getFullYear() + "-" +  ("0"+(d.getMonth()+1)).slice(-2) + "-" +
@@ -165,7 +167,8 @@
         var type_obj = obj.find("#type");//取得type obj
         var notes_obj = obj.find("#notes");
         var gender_obj = obj.find("#gender");
-        var arr = get_tr_property(obj);      
+        var timestamp_obj = obj.find("#timestamp");
+        var arr = get_tr_property(obj);    
         // 將資料存入並轉成顯示模式
         setText(name_obj.find(".text"),arr[0]);
         setText(tel_obj.find(".text"),arr[1]);
@@ -173,6 +176,7 @@
         setText(type_obj.find(".text"),arr[3]);
         setText(type_obj.find(".selectIndex"),arr[4]);
         setText(gender_obj.find(".text"),arr[5]);
+        setText(timestamp_obj.find(".text"),arr[6])
         // 將資料以k,v 格式存入arr{map}中
     	return set_sing_data_to_map_from_arr(arr,map_sing_data);
     }
@@ -185,8 +189,8 @@
         var type =type_obj.find($("select > option:selected")).val();
         var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
         var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
-        console.log("gender:"+gender);
-        arr_val=[name,tel,notes,type,type_index.toString(),gender];
+        var timestamp = date_str;
+        arr_val=[name,tel,notes,type,type_index.toString(),gender,timestamp];
         return arr_val;
     }
     function getID(str){
@@ -214,6 +218,7 @@
         obj.find("#type > .text").show();
         obj.find("#notes > .text").show();
         obj.find("#gender > .text").show();
+        obj.find("#timestamp > .text").show();
     }
     function editModeBtn(obj){
         obj.find("input").show();
@@ -268,6 +273,7 @@
         set_loc_store(map_multi_data,inner_html);
         // 將編輯格式隱藏
         readModeBtn(obj_div_tr);
+        console.log(map_sing_data);
         console.log(map_multi_data);
         // console.log(JSON.parse(JSON.stringify(map_multi_data)));
     });
