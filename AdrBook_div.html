@@ -114,7 +114,11 @@
 </body>
 <script>  
     var map_multi_data={};
-    var arr_keys = ["name","tel","notes","type","type_index","gender","timestamp"];
+    var object_show_hide_key =
+     {
+      "1":["input",".inner_text","select","textarea",".save-btn",".cancel-btn"]
+     ,"2":[".edit-btn",".del-btn",".text"]
+     };
     var loc_ser_number = 0;// store gender 's radio name serial_number
     
     $( document).ready(function(){
@@ -126,7 +130,7 @@
         loc_ser_number = localStorage.getItem("loc_ser_number");
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
         console.log("init:"+loc_ser_number);
-        readModeBtn(class_tbody);
+        mode_change_event(class_tbody,"read");
     });
     function get_date_str(){
         var d = new Date();// 取得現在時間
@@ -157,35 +161,29 @@
 	    obj.find("#notes > textarea").val(notes);
         obj.find("input[type=radio][value="+gender+"]").prop("checked",true);
     }
-    function set_sing_data_to_map_from_arr(arr,map){
-        for(var k=0;k<arr_keys.length;k++){
-            var key = arr_keys[k];
-            map[key]=arr[k];
-        }
+    function set_sing_data_to_map_from_obj(object,map){
+        $.each(object,function(key,value){
+            map[key]=value;
+        });
         return map;
     }
     function save_process(obj){
         var map_sing_data = {};
-        var name_obj = obj.find("#name");
-        var tel_obj = obj.find("#tel");
-        var type_obj = obj.find("#type");//取得type obj
-        var notes_obj = obj.find("#notes");
-        var gender_obj = obj.find("#gender");
-        var timestamp_obj = obj.find("#timestamp");
-        var arr = get_tr_property(obj);    
+        var object_val = get_tr_property(obj);  
+        
         // 將資料存入並轉成顯示模式
-        setText(name_obj.find(".text"),arr[0]);
-        setText(tel_obj.find(".text"),arr[1]);
-        setText(notes_obj.find(".text"),arr[2]);
-        setText(type_obj.find(".text"),arr[3]);
-        setText(type_obj.find(".selectIndex"),arr[4]);
-        setText(gender_obj.find(".text"),arr[5]);
-        setText(timestamp_obj.find(".text"),arr[6])
+        $.each(object_val,function(key,value){
+            if(key.indexOf("type_index")<0){
+                setText(obj.find("#"+key+" > .text"),value);           
+            }
+        });
+        setText(obj.find("#type > .selectIndex"),object_val["type_index"]);
         // 將資料以k,v 格式存入arr{map}中
-    	return set_sing_data_to_map_from_arr(arr,map_sing_data);
+    	return set_sing_data_to_map_from_obj(object_val,map_sing_data);
     }
     function get_tr_property(obj){
-        var arr_val = new Array();
+        // var arr_val = new Array();
+        var object_val ={};
         var name = obj.find($("#name > input")).val();//取得name 內的值
         var tel = obj.find($("#tel > input")).val();//取得tel 內的值
         var notes = obj.find($("#notes > textarea")).val();//取得notes textarea的值   
@@ -194,8 +192,9 @@
         var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
         var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
         var timestamp = get_date_str();
-        arr_val=[name,tel,notes,type,type_index.toString(),gender,timestamp];
-        return arr_val;
+        object_val = {"name":name,"tel":tel,"notes":notes,"type":type,"type_index":type_index.toString(),"gender":gender,"timestamp":timestamp};
+        // arr_val=[name,tel,notes,type,type_index.toString(),gender,timestamp];
+        return object_val;
     }
     function getID(str){
     	var id = $(str).prop("id");
@@ -207,38 +206,16 @@
     function getTrObjFromBtn(obj){
     	 return obj.parent().parent();
     }
-    function readModeBtn(obj){
-        obj.find("input").hide();
-        obj.find(".inner_text").hide();
-        obj.find("select").hide();
-        obj.find("textarea").hide();
-        obj.find(".save-btn").hide();
-        obj.find(".cancel-btn").hide();
-        obj.find(".edit-btn").show();
-        obj.find(".del-btn").show();
-        obj.find("#no >.text").show();
-        obj.find("#name > .text").show();
-        obj.find("#tel > .text").show();
-        obj.find("#type > .text").show();
-        obj.find("#notes > .text").show();
-        obj.find("#gender > .text").show();
-        obj.find("#timestamp > .text").show();
-    }
-    function editModeBtn(obj){
-        obj.find("input").show();
-        obj.find(".inner_text").show();
-        obj.find("select").show();
-        obj.find("textarea").show();
-        obj.find(".save-btn").show();
-        obj.find(".cancel-btn").show();
-        obj.find(".edit-btn").hide();
-        obj.find(".del-btn").hide();
-        obj.find("#no >.text").hide();
-        obj.find("#name > .text").hide();
-        obj.find("#tel > .text").hide();
-        obj.find("#gender > .text").hide();
-        obj.find("#type > .text").hide();
-        obj.find("#notes > .text").hide();
+    function mode_change_event(obj,mode){
+        $.each(object_show_hide_key,function(key,object){
+            $.each(object,function(index,value){
+                if((mode=="read" &&key=="1")||(mode=="edit" &&key=="2")){// "1": element like input , select, textarea, save-btn,cancel-btn
+                    obj.find(value).hide();
+                }else{// "2": element like .text , del-btn,edit-btn
+                    obj.find(value).show();
+                }
+            });                 
+        });
     }
     /*新增動作
     1.新增一個樣板
@@ -259,9 +236,7 @@
         localStorage.setItem("loc_ser_number",JSON.stringify(loc_ser_number));
         // disabled add-btn 
         // $("#add-btn").attr('disabled',true);
-        
-    });
-   
+    });   
     /*
     0.儲存動作
     1.將樣板內容input 存起來
@@ -276,7 +251,7 @@
         var inner_html =obj_div_tr.parent().prop("innerHTML");// 儲存DOM格式
         set_loc_store(map_multi_data,inner_html);
         // 將編輯格式隱藏
-        readModeBtn(obj_div_tr);
+        mode_change_event(obj_div_tr,"read");
         console.log(map_sing_data);
         console.log(map_multi_data);
         // console.log(JSON.parse(JSON.stringify(map_multi_data)));
@@ -291,7 +266,7 @@
         //將.text 資料塞入 input
         edit_process(obj_div_tr);
         //將閱讀格式隱藏，將原text欄位隱藏
-        editModeBtn(obj_div_tr);       
+        mode_change_event(obj_div_tr,"edit");       
     });
     /*
     0.點選x-btn 將編輯模式取消，回到顯示模式
@@ -313,7 +288,7 @@
             obj_div_tr.find("input[type=radio][value="+gender+"]").prop("checked",true);
 	        // console.log(no+name+tel+notes);
 	        //將閱讀格式隱藏，將原text欄位隱藏
-	        readModeBtn(obj_div_tr);    
+	        mode_change_event(obj_div_tr,"read");    
         }else{//第一次產生的DOM 
         	console.log("第一次產生被取消");
         	obj_div_tr.remove();//將tr元素移除、清空
@@ -336,9 +311,9 @@
                 var map_sing_data = {};  
 				// console.log('del :'+num);
                 var obj_div_tr = $(this);// obj_tbody_tr each item
-                var arr = get_tr_property(obj_div_tr);
+                var object_val = get_tr_property(obj_div_tr);
                 // 將資料以k,v 格式存入arr{map}中
-                map_multi_data[num.toString()]=set_sing_data_to_map_from_arr(arr,map_sing_data);
+                map_multi_data[num.toString()]=set_sing_data_to_map_from_obj(object_val,map_sing_data);
 				$(this).find("#no > .text").text(num);
 				$(this).find("#no > input").val(num);
             });
