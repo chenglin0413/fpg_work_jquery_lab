@@ -3,7 +3,12 @@
 <head>
     
     <style type="text/css">
-
+        body{
+            margin-left: 10px;
+            position:absolute;
+            height:100%;
+            width:100%;
+        }
         .addressbook-table-add {
             position: relative;
             width: 30px;
@@ -30,16 +35,15 @@
 
         .addressbook-table .tr {
             display: table-row-group;
-            width: 660px;
-
+            width: 165px;
         }
 
         .addressbook-table .th,
         .addressbook-table .td {
             text-align:center;
-            width: 180px;
-            border: 0.5px solid navy;
-            padding: 1px;
+            width: 165px;
+            border: 0.1px solid navy;
+            /*padding: 0.1px;*/
             display: table-cell;
 
         }
@@ -70,6 +74,7 @@
         <div class="addressbook-table">
             <div class="thead">
                 <div class="tr">
+                    <div  class="th"><input type="checkbox"/><br><span>select all</span></div>
                     <div  class="th">No(編號)</div>
                     <div  class="th">Name(姓名)</div>
                     <div  class="th">tel(電話)</div>
@@ -86,6 +91,7 @@
 <!--樣板-->
 <span id="temp" style="display: none">
 <div id="div-tr-temp" class="tr"  >
+        <div id="checkbox" class="td"><div class="checkbox"><input type="checkbox"/></div></div>
         <div id="no" class="td"><div class="text" style="display: none;"></div><input type="text"></div>
         <div id="name" class="td"><div class="text"></div><input type="text"></div>
         <div id="tel" class="td"><div class="text"></div><input type="text"></div>
@@ -116,8 +122,8 @@
     var map_multi_data={};
     var object_show_hide_key =
      {
-      "1":["input",".inner_text","select","textarea",".save-btn",".cancel-btn"]
-     ,"2":[".edit-btn",".del-btn",".text"]
+      "1":["input:not(:checkbox)",".inner_text","select","textarea",".save-btn",".cancel-btn"]
+     ,"2":[".edit-btn",".del-btn",".text","input[type=checkbox]"]
      };
     var loc_ser_number = 0;// store gender 's radio name serial_number
     
