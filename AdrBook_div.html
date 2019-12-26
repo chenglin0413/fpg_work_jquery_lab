@@ -9,7 +9,7 @@
             height:100%;
             width:100%;
         }
-        .addressbook-table-add {
+        .addressbook-table-btn {
             position: relative;
             width: 30px;
             height: 30px;
@@ -69,12 +69,13 @@
         <h2 style="text-align:center"> AddressBook_lab</h2>   
     </div>
      <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"></script>
-        <button id="add-btn" class="addressbook-table-add"><i class="fas fa-plus-square"></i></button>
+        <button id="add-btn" class="addressbook-table-btn"><i class="fas fa-plus-square"></i></button>
+        <button id="del-check-btn" class="addressbook-table-btn"><i class="fas fa-user-times"></i></button>
         <BR>
         <div class="addressbook-table">
             <div class="thead">
                 <div class="tr">
-                    <div  class="th"><input type="checkbox"/><br><span>select all</span></div>
+                    <div  class="th"><input type="checkbox" class="checkbox_all" /><br><span>select all</span></div>
                     <div  class="th">No(編號)</div>
                     <div  class="th">Name(姓名)</div>
                     <div  class="th">tel(電話)</div>
@@ -127,6 +128,9 @@
      };
     var loc_ser_number = 0;// store gender 's radio name serial_number
     
+
+    
+
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
         var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
@@ -333,6 +337,54 @@
             set_loc_store(map_multi_data,inner_html);
             console.log(map_multi_data);              
         }
+    });
+    /*
+    0.點選check(select all) selector : checkbox
+    */
+    $(".checkbox_all").click(function(){
+        var obj_checkbox_all = $(this);
+        var check_flag = obj_checkbox_all.prop("checked");
+        var obj_input_checkbox = $(".tbody  input[type=checkbox]");
+        obj_input_checkbox.each(function(idx,val){
+            var obj = $(this);//get each item
+            if(check_flag){
+                obj.prop("checked",true);
+            }else{
+                obj.prop("checked",false);
+            }
+        });
+    });
+    /*
+    0.點選check(single checkbox) selector : checkbox
+    */
+    $(".checkbox_all").click(function(){
+        var obj_checkbox_all = $(this);
+        var check_flag = obj_checkbox_all.prop("checked");
+        var obj_input_checkbox = $(".tbody  input[type=checkbox]");
+        obj_input_checkbox.each(function(idx,val){
+            var obj = $(this);//get each item
+            if(check_flag){
+                obj.prop("checked",true);
+            }else{
+                obj.prop("checked",false);
+            }
+        });
+    });
+    /*
+    0.點選check(single checkbox) selector : checkbox
+    */
+    $("#del-check-btn").click(function(){
+        var obj_checkbox_all = $(this);
+        var check_flag = obj_checkbox_all.prop("checked");
+        var obj_input_checkbox = $(".tbody  input[type=checkbox]");
+        obj_input_checkbox.each(function(idx,val){
+            var obj = $(this);//get each item
+            if(check_flag){
+                obj.prop("checked",true);
+            }else{
+                obj.prop("checked",false);
+            }
+        });
     });
 </script>
 
