@@ -192,8 +192,23 @@
         // 將資料以k,v 格式存入arr{map}中
     	return set_sing_data_to_map_from_obj(object_val,map_sing_data);
     }
-    function del_reload_process(obj_old){
+    function del_process(obj_old){
         obj_old.remove();//將tr元素移除、清空
+        reload_save_process();
+        // var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
+        // obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
+        //     var num = parseInt(index)+1;
+        //     var map_sing_data = {};  
+		// 	// console.log('del :'+num);
+        //     var obj = $(this);// obj_tbody_tr each item
+        //     var object_val = get_tr_property(obj);
+        //     // 將資料以k,v 格式存入arr{map}中
+        //     map_multi_data[num.toString()]=set_sing_data_to_map_from_obj(object_val,map_sing_data);
+		// 	$(this).find("#no > .text").text(num);
+		// 	$(this).find("#no > input").val(num);
+        // });
+    }
+    function reload_save_process(){
         var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
         obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
             var num = parseInt(index)+1;
@@ -201,6 +216,7 @@
 			// console.log('del :'+num);
             var obj = $(this);// obj_tbody_tr each item
             var object_val = get_tr_property(obj);
+            console.log("object_val :"+object_val);
             // 將資料以k,v 格式存入arr{map}中
             map_multi_data[num.toString()]=set_sing_data_to_map_from_obj(object_val,map_sing_data);
 			$(this).find("#no > .text").text(num);
@@ -218,6 +234,7 @@
         var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
         var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
         var timestamp = get_date_str();
+        console.log("notict"+name+tel+notes);
         object_val = {"name":name,"tel":tel,"notes":notes,"type":type,"type_index":type_index.toString(),"gender":gender,"timestamp":timestamp}
         return object_val;
     }
@@ -317,7 +334,7 @@
         }else{//第一次產生的DOM 
         	console.log("第一次產生被取消");
             map_multi_data = {};//將資料刷新重新存     
-            del_reload_process(obj_div_tr);
+            del_process(obj_div_tr);
             var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
             set_loc_store(map_multi_data,inner_html);
         }    
@@ -332,7 +349,7 @@
         var check = confirm("Are you sure you want to delete "+name+"from AddressBook?");
         if(check){
             map_multi_data = {};//將資料刷新重新存     
-            del_reload_process(obj_div_tr);
+            del_process(obj_div_tr);
             var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
             set_loc_store(map_multi_data,inner_html);
             console.log(map_multi_data);              
@@ -357,34 +374,21 @@
     /*
     0.點選check(single checkbox) selector : checkbox
     */
-    $(".checkbox_all").click(function(){
-        var obj_checkbox_all = $(this);
-        var check_flag = obj_checkbox_all.prop("checked");
-        var obj_input_checkbox = $(".tbody  input[type=checkbox]");
-        obj_input_checkbox.each(function(idx,val){
-            var obj = $(this);//get each item
-            if(check_flag){
-                obj.prop("checked",true);
-            }else{
-                obj.prop("checked",false);
-            }
-        });
-    });
-    /*
-    0.點選check(single checkbox) selector : checkbox
-    */
     $("#del-check-btn").click(function(){
-        var obj_checkbox_all = $(this);
-        var check_flag = obj_checkbox_all.prop("checked");
-        var obj_input_checkbox = $(".tbody  input[type=checkbox]");
+        var obj_input_checkbox = $(".tbody input[type=checkbox]");
         obj_input_checkbox.each(function(idx,val){
             var obj = $(this);//get each item
+            var obj_div_tr = getTrObjFromBtn(obj).parent();
+            var check_flag = obj.prop("checked");
             if(check_flag){
-                obj.prop("checked",true);
-            }else{
-                obj.prop("checked",false);
+                obj_div_tr.remove();                
             }
         });
+        map_multi_data = {};//將資料刷新重新存     
+        reload_save_process();
+        var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
+        set_loc_store(map_multi_data,inner_html);
+        console.log("map_multi_data："+map_multi_data[1]["name"]);
     });
 </script>
 
