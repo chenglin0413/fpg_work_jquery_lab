@@ -180,7 +180,7 @@
     }
     function save_process(obj){
         var map_sing_data = {};
-        var object_val = get_tr_property(obj);  
+        var object_val = get_tr_property(obj,"save");  
         
         // 將資料存入並轉成顯示模式
         $.each(object_val,function(key,value){
@@ -195,18 +195,6 @@
     function del_process(obj_old){
         obj_old.remove();//將tr元素移除、清空
         reload_save_process();
-        // var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
-        // obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
-        //     var num = parseInt(index)+1;
-        //     var map_sing_data = {};  
-		// 	// console.log('del :'+num);
-        //     var obj = $(this);// obj_tbody_tr each item
-        //     var object_val = get_tr_property(obj);
-        //     // 將資料以k,v 格式存入arr{map}中
-        //     map_multi_data[num.toString()]=set_sing_data_to_map_from_obj(object_val,map_sing_data);
-		// 	$(this).find("#no > .text").text(num);
-		// 	$(this).find("#no > input").val(num);
-        // });
     }
     function reload_save_process(){
         var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
@@ -215,7 +203,7 @@
             var map_sing_data = {};  
 			// console.log('del :'+num);
             var obj = $(this);// obj_tbody_tr each item
-            var object_val = get_tr_property(obj);
+            var object_val = get_tr_property(obj,"del");
             console.log("object_val :"+object_val);
             // 將資料以k,v 格式存入arr{map}中
             map_multi_data[num.toString()]=set_sing_data_to_map_from_obj(object_val,map_sing_data);
@@ -223,17 +211,36 @@
 			$(this).find("#no > input").val(num);
         });
     }
-    function get_tr_property(obj){
+    function get_tr_property(obj,mode){
         // var arr_val = new Array();
         var object_val ={};
-        var name = obj.find($("#name > input")).val();//取得name 內的值
-        var tel = obj.find($("#tel > input")).val();
-        var notes = obj.find($("#notes > textarea")).val();//取得notes textarea的值   
-        var type_obj = obj.find("#type");//取得type obj
-        var type =type_obj.find($("select > option:selected")).val();
-        var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
-        var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
-        var timestamp = get_date_str();
+        var name,tel,notes,type_obj,type,type_index,gender,timestamp="";
+        if(mode==="save"){
+            name = obj.find($("#name > input")).val();//取得name 內的值
+            tel = obj.find($("#tel > input")).val();
+            notes = obj.find($("#notes > textarea")).val();//取得notes textarea的值   
+            type_obj = obj.find("#type");//取得type obj
+            type =type_obj.find($("select > option:selected")).val();
+            type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
+            gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
+            timestamp = get_date_str();
+        }else if(mode==="del"){
+            name = obj.find("#name > .text").text();//取得name 內的值
+            tel = obj.find("#tel > .text").text();
+            notes = obj.find("#notes > .text").text();//取得notes textarea的值   
+            type = obj.find("#type > .text").text();
+            type_index = obj.find($("#type > select"))[0].selectedIndex;//取得type  option 的索引
+            gender = obj.find("#gender > .text").text();//取得option btn 的值
+            timestamp = get_date_str();
+        }
+        // var name = obj.find($("#name > input")).val();//取得name 內的值
+        // var tel = obj.find($("#tel > input")).val();
+        // var notes = obj.find($("#notes > textarea")).val();//取得notes textarea的值   
+        // var type_obj = obj.find("#type");//取得type obj
+        // var type =type_obj.find($("select > option:selected")).val();
+        // var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
+        // var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
+        // var timestamp = get_date_str();
         console.log("notict"+name+tel+notes);
         object_val = {"name":name,"tel":tel,"notes":notes,"type":type,"type_index":type_index.toString(),"gender":gender,"timestamp":timestamp}
         return object_val;
@@ -388,7 +395,7 @@
         reload_save_process();
         var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
         set_loc_store(map_multi_data,inner_html);
-        console.log("map_multi_data："+map_multi_data[1]["name"]);
+        // console.log("map_multi_data："+map_multi_data[1]["name"]);
     });
 </script>
 
