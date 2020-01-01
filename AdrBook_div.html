@@ -140,14 +140,7 @@
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
         console.log("init:"+loc_ser_number);
         mode_change_event(class_tbody,"read");
-        let items = document.querySelectorAll('.tbody > .tr');
-        items.forEach(item => {
-          $(item).prop('draggable', true)
-          item.addEventListener('dragstart', dragStart)
-          item.addEventListener('drop', dropped)
-          item.addEventListener('dragenter', cancelDefault)
-          item.addEventListener('dragover', cancelDefault)
-        });
+        select_all_tr_add_draggble_evnetlistener();
     });
     function get_date_str(){
         var d = new Date();// 取得現在時間
@@ -240,14 +233,6 @@
             gender = obj.find("#gender > .text").text();//取得option btn 的值
             timestamp = get_date_str();
         }
-        // var name = obj.find($("#name > input")).val();//取得name 內的值
-        // var tel = obj.find($("#tel > input")).val();
-        // var notes = obj.find($("#notes > textarea")).val();//取得notes textarea的值   
-        // var type_obj = obj.find("#type");//取得type obj
-        // var type =type_obj.find($("select > option:selected")).val();
-        // var type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
-        // var gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
-        // var timestamp = get_date_str();
         console.log("notict"+name+tel+notes);
         object_val = {"name":name,"tel":tel,"notes":notes,"type":type,"type_index":type_index.toString(),"gender":gender,"timestamp":timestamp}
         return object_val;
@@ -290,6 +275,7 @@
         $(".tbody .tr #no .text").last().text(tr_size);
         $(".tbody .tr #gender").last().find("input").prop("name",loc_ser_number);//get new radio-btn
         localStorage.setItem("loc_ser_number",JSON.stringify(loc_ser_number));
+        add_draggble_eventlistener($(".tr").last());
         // disabled add-btn 
         // $("#add-btn").attr('disabled',true);
     });   
@@ -408,22 +394,25 @@
     0.將tbody上的tr全部加入draggble 屬性
     1.將tr 上增加dragstart,drop,dragenter,dragend功能
     */
-    // $(".tbody").on("click",".tr",function () {
-    //   let obj_tr = document.
-    //   obj_tr.prop('draggable', true)
-    //   obj_tr.target.addEventListener('dragstart', dragStart);
-    //   obj_tr.target.addEventListener('drop', dropped);
-    //   obj_tr.target.addEventListener('dragenter', cancelDefault);
-    //   obj_tr.target.addEventListener('dragover', cancelDefault);
-    // })
-
-    function dragStart (e) {
+    function select_all_tr_add_draggble_evnetlistener(){
+        let items = document.querySelectorAll('.tbody > .tr');
+        items.forEach(item => {
+          add_draggble_eventlistener(item);
+        });
+    } 
+    function add_draggble_eventlistener(obj){
+        $(obj).prop('draggable', true)
+        obj.addEventListener('dragstart', drag_start)
+        obj.addEventListener('drop', dropped)
+        obj.addEventListener('dragenter', cancel_default)
+        obj.addEventListener('dragover', cancel_default)
+    }
+    function drag_start (e) {
       var index = $(e.target).index()
       e.dataTransfer.setData('text/plain', index)
     }
-
     function dropped (e) {
-      cancelDefault(e)
+      cancel_default(e)
       
       // get new and old index
       let oldIndex = e.dataTransfer.getData('text/plain')
@@ -441,14 +430,11 @@
         target.parents(".tr").after(dropped)
       }
     }
-
-    function cancelDefault (e) {
+    function cancel_default (e) {
       e.preventDefault()
       e.stopPropagation()
       return false
     }
-
-
 </script>
 
 </html>
