@@ -127,8 +127,7 @@
      ,"2":[".edit-btn",".del-btn",".text","input[type=checkbox]"]
      };
     var loc_ser_number = 0;// store gender 's radio name serial_number
-    
-
+   
     
 
     $( document).ready(function(){
@@ -141,6 +140,14 @@
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
         console.log("init:"+loc_ser_number);
         mode_change_event(class_tbody,"read");
+        let items = document.querySelectorAll('.tbody > .tr');
+        items.forEach(item => {
+          $(item).prop('draggable', true)
+          item.addEventListener('dragstart', dragStart)
+          item.addEventListener('drop', dropped)
+          item.addEventListener('dragenter', cancelDefault)
+          item.addEventListener('dragover', cancelDefault)
+        });
     });
     function get_date_str(){
         var d = new Date();// 取得現在時間
@@ -397,6 +404,51 @@
         set_loc_store(map_multi_data,inner_html);
         // console.log("map_multi_data："+map_multi_data[1]["name"]);
     });
+    /*
+    0.將tbody上的tr全部加入draggble 屬性
+    1.將tr 上增加dragstart,drop,dragenter,dragend功能
+    */
+    // $(".tbody").on("click",".tr",function () {
+    //   let obj_tr = document.
+    //   obj_tr.prop('draggable', true)
+    //   obj_tr.target.addEventListener('dragstart', dragStart);
+    //   obj_tr.target.addEventListener('drop', dropped);
+    //   obj_tr.target.addEventListener('dragenter', cancelDefault);
+    //   obj_tr.target.addEventListener('dragover', cancelDefault);
+    // })
+
+    function dragStart (e) {
+      var index = $(e.target).index()
+      e.dataTransfer.setData('text/plain', index)
+    }
+
+    function dropped (e) {
+      cancelDefault(e)
+      
+      // get new and old index
+      let oldIndex = e.dataTransfer.getData('text/plain')
+      let target = $(e.target)
+      console.log(target);
+      let newIndex = target.index()
+      
+      // remove dropped items at old place
+      let dropped = $(this).parent().children().eq(oldIndex).remove()
+
+      // insert the dropped items at new place
+      if (newIndex < oldIndex) {
+        target.parents(".tr").before(dropped)
+      } else {
+        target.parents(".tr").after(dropped)
+      }
+    }
+
+    function cancelDefault (e) {
+      e.preventDefault()
+      e.stopPropagation()
+      return false
+    }
+
+
 </script>
 
 </html>
