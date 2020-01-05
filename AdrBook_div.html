@@ -135,22 +135,29 @@
         // var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
         // class_tbody.append(loc_storage_dom);//retrive the dom elemetn from localstorage ,append  on tbody
         map_multi_data = JSON.parse(loc_storage_data_json);
-        var size_map_multi_data = Object.keys(map_multi_data).length;
         loc_ser_number = localStorage.getItem("loc_ser_number");
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
+        var size_map_multi_data = Object.keys(map_multi_data).length;
         console.log("init:"+loc_ser_number);
-        for(var i=0;i<size_map_multi_data;i++){
-            add_process();
+        if(!size_map_multi_data==0){
+            load_data_from_loc_storage(map_multi_data,size_map_multi_data);
         }
-        var obj_tbody_tr_all = $(".tbody > .tr");
-        obj_tbody_tr_all.each(function(idx){
-            var key = Object.keys(map_multi_data);
-            var value = map_multi_data[key]["name"];
-            console.log("key:"+key+"value :"+value);
-        });
         mode_change_event($(".tbody"),"read");
         select_all_tr_add_draggble_evnetlistener();
     });
+    function load_data_from_loc_storage(map_data,map_size){
+       for(var i=0;i<map_size;i++){
+            add_process();
+        }
+        var obj_tbody_tr_all = $(".tbody > .tr");
+        obj_tbody_tr_all.each(function(index){
+            var obj_tr = $(this);
+            var key = parseInt(index)+1;
+            var map_sing_data = map_data[key];
+            var object_val = get_tr_property(map_sing_data,"reload");
+            set_map_sing_data_text(obj_tr,object_val);
+        }); 
+    }
     function get_date_str(){
         var d = new Date();// 取得現在時間
         var date_str = d.getFullYear() + "-" +  ("0"+(d.getMonth()+1)).slice(-2) + "-" +
@@ -167,7 +174,7 @@
         localStorage.setItem("addressbook-data",JSON.stringify(obj));
         localStorage.setItem("addressbook-dom",dom);
     }
-    function set_map_multi_data_text(obj,map){
+    function set_map_sing_data_text(obj,map){
         var object_val = map; 
         // 將資料存入並轉成顯示模式
         $.each(object_val,function(key,value){
@@ -212,7 +219,7 @@
     function save_process(obj){
         var map_sing_data = {};
         var object_val = get_tr_property(obj,"save");
-        set_map_multi_data_text(obj,object_val);        
+        set_map_sing_data_text(obj,object_val);        
         // // 將資料存入並轉成顯示模式
         // $.each(object_val,function(key,value){
         //     if(key.indexOf("type_index")<0){
@@ -264,13 +271,13 @@
             gender = obj.find("#gender > .text").text();//取得option btn 的值
             timestamp = get_date_str();
         }else if(mode==="reload"){
-            name = obj.find("#name > .text").text();//取得物件內 name 內的值
-            tel = obj.find("#tel > .text").text();
-            notes = obj.find("#notes > .text").text();//取得物件內 notes textarea的值   
-            type = obj.find("#type > .text").text();
-            type_index = obj.find($("#type > select"))[0].selectedIndex;//取得物件內 type  option 的索引
-            gender = obj.find("#gender > .text").text();//取得物件內 option btn 的值
-            timestamp = get_date_str();
+            name = obj["name"];//取得物件內 name 內的值
+            tel = obj["tel"];
+            notes = obj["notes"];//取得物件內 notes textarea的值   
+            type = obj["type"];
+            type_index = obj["type_index"];//取得物件內 type  option 的索引
+            gender = obj["gender"];//取得物件內 option btn 的值
+            timestamp = obj["timestamp"];
         }
         console.log("notict"+name+tel+notes);
         object_val = {"name":name,"tel":tel,"notes":notes,"type":type,"type_index":type_index.toString(),"gender":gender,"timestamp":timestamp}
@@ -303,23 +310,6 @@
     */
     $("#add-btn").click(function () {
         add_process();
-
-
-        // loc_ser_number++;
-        // var obj_div_tr_temp =  $("#temp > #div-tr-temp");//取得dom 物件
-        // var html_div_temp = get_outer_html(obj_div_tr_temp);//取得HTML
-        // $(".tbody ").append(html_div_temp);//將樣板塞入
-        // // var new_obj_div_tr_temp =$(".tbody").find($("#div-tr-temp"));//取得新樣板
-        // // var new_obj_div_tr_temp_cancel_btn =$(".tbody").find($("#cancel-btn"));//取得新樣板之cancel-btn
-        // // $(".tbody .tr #no input").last().attr("disabled",true).val(no_index);//將第一個屬性設為disabled 並加index新增
-        // var tr_size = $(".tbody > .tr").length;//取得 tbody > .tr element 的數量
-        // $(".tbody .tr #no input").last().attr("disabled",true).val(tr_size);//
-        // $(".tbody .tr #no .text").last().text(tr_size);
-        // $(".tbody .tr #gender").last().find("input").prop("name",loc_ser_number);//get new radio-btn
-        // localStorage.setItem("loc_ser_number",JSON.stringify(loc_ser_number));
-        // select_all_tr_add_draggble_evnetlistener();
-        // disabled add-btn 
-        // $("#add-btn").attr('disabled',true);
     });   
     /*
     0.儲存動作
