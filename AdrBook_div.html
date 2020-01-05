@@ -132,8 +132,6 @@
 
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
-        // var loc_storage_dom = localStorage.getItem("addressbook-dom");//讀取 localStorage 內物件-dom 
-        // class_tbody.append(loc_storage_dom);//retrive the dom elemetn from localstorage ,append  on tbody
         map_multi_data = JSON.parse(loc_storage_data_json);
         loc_ser_number = localStorage.getItem("loc_ser_number");
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
