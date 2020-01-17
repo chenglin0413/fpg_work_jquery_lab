@@ -118,6 +118,7 @@
         <div id="timestamp" class="td"><div class="text" style="display: none;"></div></div>
 </div>
 </span>
+<button id="test" class="test"><i class="far fa-trash-alt"></i></button>
 </body>
 <script>  
     var map_multi_data={};
@@ -143,6 +144,103 @@
         mode_change_event($(".tbody"),"read");
         select_all_tr_add_draggble_evnetlistener();
     });
+    function ajax_test_post(){//insert to restdb
+        var jsondata = {"name": "charice","tel": "567"};
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook",
+            "method": "POST",
+            "headers": {
+                "content-type": "application/json",
+                "x-apikey": "5e1e55adc319d331d3e277cb",
+                "cache-control": "no-cache"
+            },
+            "processData": false,
+            "data": JSON.stringify(jsondata)
+        }
+        $.ajax(settings).done(function (response) {
+        console.log(response);
+        });
+    }
+    function ajax_test_get_id(col_num){//query  from restdb
+        var num = (col_num).toString();
+        var ObjectID = "";
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook",
+            "method": "GET",
+            "headers": {
+                "content-type": "application/json",
+                "x-apikey": "5e1e55adc319d331d3e277cb",
+                "cache-control": "no-cache"
+            }
+        }
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            ObjectID = response[num]["_id"];
+            console.log("ObjectID in get_id :"+ObjectID);
+        });
+        return ObjectID;
+    }
+    function ajax_test_get(){//query  from restdb
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook",
+            "method": "GET",
+            "headers": {
+                "content-type": "application/json",
+                "x-apikey": "5e1e55adc319d331d3e277cb",
+                "cache-control": "no-cache"
+            }
+        }
+        $.ajax(settings).done(function (response) {
+        console.log(response);
+        });
+    }
+    function ajax_test_put(){//update to restdb
+        var jsondata = {"field1": "new value","field2": "xxx"};
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook/(ObjectID)",
+            "method": "PUT",
+            "headers": {
+                "content-type": "application/json",
+                "x-apikey": "5e1e55adc319d331d3e277cb",
+                "cache-control": "no-cache"
+            },
+            "processData": false,
+            "data": JSON.stringify(jsondata)
+        }
+        $.ajax(settings).done(function (response) {
+        console.log(response);
+        });
+    }
+    function ajax_test_delete(col_num){//delete to restdb
+        var str_url = "https://dressbook01-d3ab.restdb.io/rest/adrbook/"+ajax_test_get_id(col_num);
+        console.log(str_url);
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": str_url,
+            "method": "DELETE",
+            "headers": {
+                "content-type": "application/json",
+                "x-apikey": "5e1e55adc319d331d3e277cb",
+                "cache-control": "no-cache"
+            }
+        }
+        $.ajax(settings).done(function (response) {
+        console.log(response);
+        });
+    }
+
+    $("#test").click(function () {
+        ajax_test_post();
+    }); 
     function load_data_from_loc_storage(map_data,map_size){
        for(var i=0;i<map_size;i++){
             add_process();
