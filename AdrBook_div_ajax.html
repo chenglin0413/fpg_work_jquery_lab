@@ -165,7 +165,6 @@
     }
     function ajax_test_get_id(col_num){//query  from restdb
         var num = (col_num).toString();
-        var ObjectID = "";
         var settings = {
             "async": true,
             "crossDomain": true,
@@ -179,10 +178,9 @@
         }
         $.ajax(settings).done(function (response) {
             console.log(response);
-            ObjectID = response[num]["_id"];
+            ObjectID = response[num]["_id"].toString();
             console.log("ObjectID in get_id :"+ObjectID);
         });
-        return ObjectID;
     }
     function ajax_test_get(){//query  from restdb
         var settings = {
@@ -200,12 +198,12 @@
         console.log(response);
         });
     }
-    function ajax_test_put(){//update to restdb
+    function ajax_test_put(objectID){//update to restdb
         var jsondata = {"field1": "new value","field2": "xxx"};
         var settings = {
             "async": true,
             "crossDomain": true,
-            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook/(ObjectID)",
+            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook/"+objectID,
             "method": "PUT",
             "headers": {
                 "content-type": "application/json",
@@ -239,7 +237,12 @@
     }
 
     $("#test").click(function () {
-        ajax_test_post();
+        var ObjectID ='';
+        var dfd = $.Deferred();
+        // dfd.done(ajax_test_get_id(0)).done(ajax_test_put(ObjectID));
+        // ajax_test_put('5e145ae99cf4c9380009b50f');
+        dfd.promise(ajax_test_get_id(3)).then(ajax_test_get_id(0));
+        
     }); 
     function load_data_from_loc_storage(map_data,map_size){
        for(var i=0;i<map_size;i++){
