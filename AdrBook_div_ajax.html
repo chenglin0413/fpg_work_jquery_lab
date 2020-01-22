@@ -122,14 +122,12 @@
 </body>
 <script>  
     var map_multi_data={};
+    var loc_ser_number = 0;// store gender 's radio name serial_number
     var object_show_hide_key =
      {
       "1":["input:not(:checkbox)",".inner_text","select","textarea",".save-btn",".cancel-btn"]
      ,"2":[".edit-btn",".del-btn",".text","input[type=checkbox]"]
-     };
-    var loc_ser_number = 0;// store gender 's radio name serial_number
-   
-    
+     };  
 
     $( document).ready(function(){
         var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
@@ -178,8 +176,9 @@
         }
         $.ajax(settings).done(function (response) {
             console.log(response);
-            ObjectID = response[num]["_id"].toString();
-            console.log("ObjectID in get_id :"+ObjectID);
+            objectID = response[num]["_id"].toString();
+            console.log("ObjectID in get_id :"+objectID);
+            ajax_test_put(objectID);
         });
     }
     function ajax_test_get(){//query  from restdb
@@ -198,12 +197,14 @@
         console.log(response);
         });
     }
-    function ajax_test_put(objectID){//update to restdb
+    function ajax_test_put(objID){//update to restdb
         var jsondata = {"field1": "new value","field2": "xxx"};
+        var url = "https://dressbook01-d3ab.restdb.io/rest/adrbook/"+objID;
+        console.log("url :"+url);
         var settings = {
             "async": true,
             "crossDomain": true,
-            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook/"+objectID,
+            "url": url,
             "method": "PUT",
             "headers": {
                 "content-type": "application/json",
@@ -237,12 +238,7 @@
     }
 
     $("#test").click(function () {
-        var ObjectID ='';
-        var dfd = $.Deferred();
-        // dfd.done(ajax_test_get_id(0)).done(ajax_test_put(ObjectID));
-        // ajax_test_put('5e145ae99cf4c9380009b50f');
-        dfd.promise(ajax_test_get_id(3)).then(ajax_test_get_id(0));
-        
+        ajax_test_get_id(0);
     }); 
     function load_data_from_loc_storage(map_data,map_size){
        for(var i=0;i<map_size;i++){
