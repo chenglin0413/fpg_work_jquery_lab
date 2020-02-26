@@ -92,7 +92,13 @@
 <!--樣板-->
 <span id="temp" style="display: none">
 <div id="div-tr-temp" class="tr"  >
-        <div id="checkbox" class="td"><div id="_id" style="display: none;"></div><div class="checkbox"><input type="checkbox"/></div></div>
+ 
+        <div id="checkbox" class="td">
+            <div class="checkbox">
+                <div id="_id" ><div class="text"></div></div>
+                <input type="checkbox"/>
+            </div>
+        </div>
         <div id="no" class="td"><div class="text" style="display: none;"></div><input type="text"></div>
         <div id="name" class="td"><div class="text"></div><input type="text"></div>
         <div id="tel" class="td"><div class="text"></div><input type="text"></div>
@@ -125,7 +131,7 @@
     var loc_ser_number = 0;// store gender 's radio name serial_number
     var object_show_hide_key =
      {
-      "1":["input:not(:checkbox)",".inner_text","select","textarea",".save-btn",".cancel-btn"]
+      "1":["input:not(:checkbox)",".inner_text","select","textarea",".save-btn",".cancel-btn",".checkbox > #_id"]
      ,"2":[".edit-btn",".del-btn",".text","input[type=checkbox]"]
      };  
 
@@ -168,26 +174,6 @@
         }
         $.ajax(settings).done(function (response) {
         console.log(response);
-        });
-    }
-    function ajax_test_get_id(col_num){//query  from restdb
-        var num = (col_num).toString();
-        var settings = {
-            "async": true,
-            "crossDomain": true,
-            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook",
-            "method": "GET",
-            "headers": {
-                "content-type": "application/json",
-                "x-apikey": "5e1e55adc319d331d3e277cb",
-                "cache-control": "no-cache"
-            }
-        }
-        $.ajax(settings).done(function (response) {
-            console.log(response);
-            objectID = response[num]["_id"].toString();
-            console.log("ObjectID in get_id :"+objectID);
-            ajax_test_put(objectID);
         });
     }
     function ajax_test_get(){//query  from restdb
@@ -238,13 +224,13 @@
         console.log(response);
         });
     }
-    function ajax_test_delete(col_num){//delete to restdb
-        var str_url = "https://dressbook01-d3ab.restdb.io/rest/adrbook/"+ajax_test_get_id(col_num);
-        console.log(str_url);
+    function ajax_test_delete(objID){//delete to restdb
+        var url = "https://dressbook01-d3ab.restdb.io/rest/adrbook/"+objID;
+        console.log(url);
         var settings = {
-            "async": true,
+            "async": false,
             "crossDomain": true,
-            "url": str_url,
+            "url": url,
             "method": "DELETE",
             "headers": {
                 "content-type": "application/json",
@@ -349,6 +335,8 @@
     	return set_sing_data_to_map_from_obj(object_val,map_sing_data);
     }
     function del_process(obj_old){
+        var objID=$(obj_old).find("#_id").text();
+        ajax_test_delete(objID);
         obj_old.remove();//將tr元素移除、清空
         reload_save_process();
     }
@@ -372,7 +360,7 @@
         var object_val ={};
         var _id,name,tel,notes,type_obj,type,type_index,gender,timestamp="";
         if(mode==="save"){
-            _id = obj["_id"];
+            _id = obj.find("#_id > .text").text();
             name = obj.find($("#name > input")).val();//取得name 內的值
             tel = obj.find($("#tel > input")).val();
             notes = obj.find($("#notes > textarea")).val();//取得notes textarea的值   
@@ -382,7 +370,7 @@
             gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
             timestamp = get_date_str();
         }else if(mode==="del"){
-            _id = obj["_id"];
+            _id = obj.find("#_id > .text").text();
             name = obj.find("#name > .text").text();//取得name 內的值
             tel = obj.find("#tel > .text").text();
             notes = obj.find("#notes > .text").text();//取得notes textarea的值   
@@ -440,11 +428,19 @@
     3.將填入的值 經由 集合{鍵值組}儲存
     */
     $(".tbody").on("click",".save-btn",function () {
-    	var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
+        var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
+        var add_flag = false;
+        if (obj_div_tr.find("#timestamp > .text").text().length==0)add_flag=true;
         var map_sing_data = save_process(obj_div_tr);
         var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
         map_multi_data[no.toString()] = map_sing_data;//儲存資料 
-        ajax_test_post(map_sing_data);//應該改用put
+        console.log("add_flag :"+add_flag);
+        if(add_flag){
+            ajax_test_post(map_sing_data);
+        }
+        else{
+            ajax_test_put(map_sing_data);//應該改用put
+        }
         // 將編輯格式隱藏
         mode_change_event(obj_div_tr,"read");
         console.log(map_sing_data);
@@ -503,8 +499,8 @@
         if(check){
             map_multi_data = {};//將資料刷新重新存     
             del_process(obj_div_tr);
-            var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
-            set_loc_store(map_multi_data,inner_html);
+            // var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
+            // set_loc_store(map_multi_data,inner_html);
             console.log(map_multi_data);              
         }
     });
@@ -534,13 +530,15 @@
             var obj_div_tr = getTrObjFromBtn(obj).parent();
             var check_flag = obj.prop("checked");
             if(check_flag){
-                obj_div_tr.remove();                
+                var objID=$(obj_div_tr).find("#_id").text();
+                ajax_test_delete(objID);  
+                obj_div_tr.remove();                            
             }
         });
         map_multi_data = {};//將資料刷新重新存     
         reload_save_process();
-        var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
-        set_loc_store(map_multi_data,inner_html);
+        // var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
+        // set_loc_store(map_multi_data,inner_html);
         // console.log("map_multi_data："+map_multi_data[1]["name"]);
     });
     /*
