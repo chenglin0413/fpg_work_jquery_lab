@@ -136,10 +136,7 @@
      };  
 
     $( document).ready(function(){
-        // var loc_storage_data_json = localStorage.getItem("addressbook-data");//json format
         map_multi_data= ajax_test_get();
-        console.log("map_multi_data :"+map_multi_data);
-        // map_multi_data = JSON.parse(loc_storage_data_json);
         loc_ser_number = localStorage.getItem("loc_ser_number");
         if(map_multi_data==null)map_multi_data={};// if loc_map is null , then give a  new {}
         var size_map_multi_data = Object.keys(map_multi_data).length;
@@ -181,7 +178,7 @@
         var settings = {
             "async": false,
             "crossDomain": true,
-            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook",
+            "url": "https://dressbook01-d3ab.restdb.io/rest/adrbook?q={}&sort=_id",
             "method": "GET",
             "headers": {
                 "content-type": "application/json",
@@ -251,6 +248,18 @@
        for(var i=0;i<map_size;i++){
             add_process();
         }
+        load_data(map_data);
+        // var obj_tbody_tr_all = $(".tbody > .tr");
+        // obj_tbody_tr_all.each(function(index){
+        //     var obj_tr = $(this);
+        //     var key = parseInt(index);
+        //     console.log("key :"+key);
+        //     var map_sing_data = map_data[key];
+        //     var object_val = get_tr_property(map_sing_data,"reload");
+        //     set_map_sing_data_text(obj_tr,object_val);
+        // }); 
+    }
+    function load_data(map_data){
         var obj_tbody_tr_all = $(".tbody > .tr");
         obj_tbody_tr_all.each(function(index){
             var obj_tr = $(this);
@@ -271,11 +280,6 @@
     }
     function get_outer_html(obj){
     	return obj.prop("outerHTML");
-    }
-    function set_loc_store(obj,dom){
-        localStorage.clear();
-        localStorage.setItem("addressbook-data",JSON.stringify(obj));
-        localStorage.setItem("addressbook-dom",dom);
     }
     function set_map_sing_data_text(obj,map){
         var object_val = map; 
@@ -323,40 +327,25 @@
     function save_process(obj){
         var map_sing_data = {};
         var object_val = get_tr_property(obj,"save");
-        set_map_sing_data_text(obj,object_val);        
-        // // 將資料存入並轉成顯示模式
-        // $.each(object_val,function(key,value){
-        //     if(key.indexOf("type_index")<0){
-        //         setText(obj.find("#"+key+" > .text"),value);           
-        //     }
-        // });
-        // setText(obj.find("#type > .selectIndex"),object_val["type_index"]);
-        // 將資料以k,v 格式存入arr{map}中
+        // set_map_sing_data_text(obj,object_val);        
     	return set_sing_data_to_map_from_obj(object_val,map_sing_data);
     }
     function del_process(obj_old){
         var objID=$(obj_old).find("#_id").text();
         ajax_test_delete(objID);
         obj_old.remove();//將tr元素移除、清空
-        reload_save_process();
+        reload_del_process();
     }
-    function reload_save_process(){
+    function reload_del_process(){
         var obj_tbody_tr = $(".tbody > .tr");//重新取得現有的element_tr
         obj_tbody_tr.each(function(index,value){//將序號逐筆更新,把資料存入map_multi_dat
             var num = parseInt(index)+1;
-            var map_sing_data = {};  
-			// console.log('del :'+num);
-            var obj = $(this);// obj_tbody_tr each item
-            var object_val = get_tr_property(obj,"del");
-            console.log("object_val :"+object_val);
-            // 將資料以k,v 格式存入arr{map}中
-            map_multi_data[num.toString()]=set_sing_data_to_map_from_obj(object_val,map_sing_data);
 			$(this).find("#no > .text").text(num);
 			$(this).find("#no > input").val(num);
         });
+        load_data(ajax_test_get());
     }
     function get_tr_property(obj,mode){
-        // var arr_val = new Array();
         var object_val ={};
         var _id,name,tel,notes,type_obj,type,type_index,gender,timestamp="";
         if(mode==="save"){
@@ -368,15 +357,6 @@
             type =type_obj.find($("select > option:selected")).val();
             type_index = type_obj.find($("select"))[0].selectedIndex;//取得type  option 的索引
             gender = obj.find($("#gender > input:checked")).val();//取得option btn 的值
-            timestamp = get_date_str();
-        }else if(mode==="del"){
-            _id = obj.find("#_id > .text").text();
-            name = obj.find("#name > .text").text();//取得name 內的值
-            tel = obj.find("#tel > .text").text();
-            notes = obj.find("#notes > .text").text();//取得notes textarea的值   
-            type = obj.find("#type > .text").text();
-            type_index = obj.find($("#type > select"))[0].selectedIndex;//取得type  option 的索引
-            gender = obj.find("#gender > .text").text();//取得option btn 的值
             timestamp = get_date_str();
         }else if(mode==="reload"){
             _id = obj["_id"];
@@ -432,8 +412,8 @@
         var add_flag = false;
         if (obj_div_tr.find("#timestamp > .text").text().length==0)add_flag=true;
         var map_sing_data = save_process(obj_div_tr);
-        var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
-        map_multi_data[no.toString()] = map_sing_data;//儲存資料 
+        // var no = obj_div_tr.find($("#no > input")).val();//取得no 內的值    	
+        // map_multi_data[no.toString()] = map_sing_data;//儲存資料 
         console.log("add_flag :"+add_flag);
         if(add_flag){
             ajax_test_post(map_sing_data);
@@ -441,6 +421,7 @@
         else{
             ajax_test_put(map_sing_data);//應該改用put
         }
+        load_data(ajax_test_get());
         // 將編輯格式隱藏
         mode_change_event(obj_div_tr,"read");
         console.log(map_sing_data);
@@ -467,25 +448,12 @@
     $(".tbody").on("click",".cancel-btn",function () {
         var obj_div_tr = getTrObjFromBtn($(this));//取得按鈕上的tr
         var timestamp = obj_div_tr.find($("#timestamp > .text")).text();//取得name 內的值
-        // var tel = obj_div_tr.find($("#tel > .text")).text();//取得tel 內的值
-        // var notes = obj_div_tr.find($("#notes > .text")).text();//取得notes textarea的值
         if((timestamp!=null && timestamp!="")){//判斷已經儲存過
-        	//取消後將資料復原
-            var gender = obj_div_tr.find("#gender > .text").text();
-	        obj_div_tr.find("#name > input").val(name);
-	        obj_div_tr.find("#tel > input").val(tel);
-	        obj_div_tr.find("select")[0].selectedIndex=obj_div_tr.find(".selectIndex").text();
-	        obj_div_tr.find("#notes > textarea").val(notes); 
-            obj_div_tr.find("input[type=radio][value="+gender+"]").prop("checked",true);
-	        // console.log(no+name+tel+notes);
 	        //將閱讀格式隱藏，將原text欄位隱藏
 	        mode_change_event(obj_div_tr,"read");    
         }else{//第一次產生的DOM 
-        	console.log("第一次產生被取消");
-            map_multi_data = {};//將資料刷新重新存     
+        	console.log("第一次產生被取消");    
             del_process(obj_div_tr);
-            var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
-            set_loc_store(map_multi_data,inner_html);
         }    
     });
     /*
@@ -499,8 +467,6 @@
         if(check){
             map_multi_data = {};//將資料刷新重新存     
             del_process(obj_div_tr);
-            // var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
-            // set_loc_store(map_multi_data,inner_html);
             console.log(map_multi_data);              
         }
     });
@@ -536,10 +502,7 @@
             }
         });
         map_multi_data = {};//將資料刷新重新存     
-        reload_save_process();
-        // var inner_html = $(".tbody").prop("innerHTML");// 儲存DOM格式
-        // set_loc_store(map_multi_data,inner_html);
-        // console.log("map_multi_data："+map_multi_data[1]["name"]);
+        reload_del_process();
     });
     /*
     0.將tbody上的tr全部加入draggble 屬性
